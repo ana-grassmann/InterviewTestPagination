@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using InterviewTestPagination.Helpers;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace InterviewTestPagination.Models.Todo {
     /// <summary>
@@ -17,9 +19,9 @@ namespace InterviewTestPagination.Models.Todo {
         /// Example implementation of List method: lists all entries of type <see cref="Todo"/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Todo> List(/* parameters */) {
+        public IEnumerable<Todo> List(ref Pager pager) {
             // invoke Datasource layer
-            return Repository.All();
+            return Repository.All().Paginate(ref pager);
         }
     }
 }
