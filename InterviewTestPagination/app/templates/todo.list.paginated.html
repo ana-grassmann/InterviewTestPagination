@@ -21,9 +21,9 @@
             . the indicators don't need to look pretty, they just have to be distinct (ascending from descending) and communicate well what they're doing
 
         -->
-        <th>Id </th>
-        <th>Task </th>
-        <th>Created Date </th>
+        <th><span ng-click="changeSorting('Id')">Id</span><i class="sortIcon fa" ng-class="getSortClass('Id')" /></th>
+        <th><span ng-click="changeSorting('Task')">Task</span><i class="sortIcon fa" ng-class="getSortClass('Task')"></i></th>
+        <th><span ng-click="changeSorting('CreatedDate')">Created date</span><i class="sortIcon fa" ng-class="getSortClass('CreatedDate')"></i></th>
     </tr>
     
     <!-- table:body -->
@@ -35,6 +35,7 @@
     - Dont worry about styling (looking pretty, centralized, etc) it just has to show that the app is still active while the request is being made
 
     -->
+    <tr><td colspan="3" ng-show="loading">LOADING...</td></tr>
     <tr ng-repeat="todo in todos track by $index">
         <td>{{todo.id}}</td>
         <td>{{todo.task}}</td>
@@ -43,4 +44,4 @@
 </table>
 
 <!-- pagination component -->
-<pagination></pagination>
+<pagination get-data="getData()" table-params="tableParams"></pagination>

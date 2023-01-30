@@ -1,14 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using InterviewTestPagination.Helpers;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace InterviewTestPagination.Models.Todo {
+namespace InterviewTestPagination.Models.Todo
+{
     /// <summary>
     /// TODO: Implement methods that enable pagination
     /// </summary>
-    public class TodoService : IModelService<Todo> {
+    public class TodoService : IModelService<Todo>
+    {
 
         private IModelRepository<Todo> _repository = new TodoRepository();
 
-        public IModelRepository<Todo> Repository {
+        public IModelRepository<Todo> Repository
+        {
             get { return _repository; }
             set { _repository = value; }
         }
@@ -17,9 +22,10 @@ namespace InterviewTestPagination.Models.Todo {
         /// Example implementation of List method: lists all entries of type <see cref="Todo"/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Todo> List(/* parameters */) {
+        public PaginatedList<Todo> List(ref Pager pager)
+        {
             // invoke Datasource layer
-            return Repository.All();
+            return Repository.All().Paginate(ref pager);
         }
     }
 }
