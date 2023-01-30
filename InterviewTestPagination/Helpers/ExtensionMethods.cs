@@ -9,35 +9,37 @@ namespace InterviewTestPagination.Helpers
 {
     public static class ExtensionMethods
     {
-        public static IEnumerable<T> Paginate<T>(this IEnumerable<T> data, ref Pager pager)
+        public static PaginatedList<T> Paginate<T>(this IEnumerable<T> data, ref Pager pager)
         {
+            PaginatedList<T> result = new PaginatedList<T>();
+
             //sorts the list first
             if (!string.IsNullOrEmpty(pager.SortBy))
             {
                 var propertyInfo = typeof(T).GetProperty(pager.SortBy);
-                
+
                 //if the sorting property is found, sorts the list
-                if(propertyInfo != null)
+                if (propertyInfo != null)
                 {
                     //ascending order is default
                     if (string.IsNullOrEmpty(pager.SortOrder) || pager.SortOrder.ToLower() == "asc")
                         data = data.OrderBy(x => propertyInfo.GetValue(x, null));
                     else
                         data = data.OrderByDescending(x => propertyInfo.GetValue(x, null));
-                }                
+                }
             }
 
             //paginates the sorted results
-            if(pager.PageSize > 0)
+            if (pager.PageSize > 0)
             {
                 pager.TotalItens = data.Count();
                 data = data.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
             }
 
-            if(pager.AttachToHeader)
-                System.Web.HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(pager));
+            result.Pagination = pager;
+            result.List = data.ToList();
 
-            return data;
+            return result;
         }
     }
 }
