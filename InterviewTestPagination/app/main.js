@@ -17,20 +17,65 @@
      */
     function todoPaginatedList() {
         var directive = {
-            restrict: "E", // example setup as an element only
+            restrict: "E", //element only,
+            transclude: false,
             templateUrl: "app/templates/todo.list.paginated.html",
-            scope: {}, // example empty isolate scope
-            controller: ["$scope", "$http", controller],
-            link: link
+            scope: {},
+            controller: ["$scope", "$http", controller]
         };
 
-        function controller($scope, $http) { // example controller creating the scope bindings
+        function controller($scope, $http) {
+            //data to be displayed on the table
             $scope.todos = [];
-            // example of xhr call to the server's 'RESTful' api
-            $http.get("api/Todo/Todos").then(response => $scope.todos = response.data);
-        }
+            //indicates if data is being loaded
+            $scope.loading = false;
+            //indicates if the sorting is not the default anymore
+            var sortingChanged = false;
+            //initialize table params
+            $scope.tableParams = {
+                totalItens: 0,
+                totalPages: 0,
+                currentPage: 1,
+                pageSize: "20",
+                sortBy: 'CreatedDate',
+                sortOrder: 'desc'
+            }
 
-        function link(scope, element, attrs) { }
+            //function to get the data from the api
+            $scope.getData = function () {
+                $scope.loading = true;
+                // example of xhr call to the server's 'RESTful' api
+                $http.get("api/Todo/Todos", { params: $scope.tableParams }).then(response => {
+                    $scope.todos = response.data.list;
+                    $scope.tableParams = response.data.pagination;
+                    $scope.loading = false;
+                });
+            }
+
+            //changes the sorting column and order, returns to page 1 and fetches the data
+            $scope.changeSorting = function (newColumn) {
+                if (newColumn == $scope.tableParams.sortBy) {
+                    $scope.tableParams.sortOrder = $scope.tableParams.sortOrder == 'asc' ? 'desc' : 'asc';
+                }                    
+                else {
+                    $scope.tableParams.sortBy = newColumn;
+                    $scope.tableParams.sortOrder = 'asc'
+                }
+                sortingChanged = true;
+                $scope.tableParams.currentPage = 1;
+                $scope.getData();
+            }
+
+            //gets the css class for sorting indicator icon
+            $scope.getSortClass = function (column) {
+                if (column == $scope.tableParams.sortBy && sortingChanged) {
+                    return $scope.tableParams.sortOrder == 'asc' ? 'fa-angle-up' : 'fa-angle-down';
+                }
+            }
+
+            $scope.getData();
+            
+        }
 
         return directive;
     }
@@ -49,14 +94,27 @@
         var directive = {
             restrict: "E", // example setup as an element only
             templateUrl: "app/templates/pagination.html",
-            scope: {}, // example empty isolate scope
-            controller: ["$scope", controller],
-            link: link
+            scope: {
+                getData: '&',
+                tableParams:'='
+            },
+            controller: ["$scope", controller]
         };
 
-        function controller($scope) { }
+        function controller($scope) {
 
-        function link(scope, element, attrs) { }
+            $scope.pageSizes = [
+                { value: 10, text: '10'},
+                { value: 20, text: '20'},
+                { value: 30, text: '30'},
+                { value: 0, text: 'All'}
+            ];
+
+            $scope.changePage = function (newPage) {
+                $scope.tableParams.currentPage = newPage;
+                $scope.getData();
+            }
+        }
 
         return directive;
     }
